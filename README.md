@@ -4,13 +4,13 @@
 This is a simple request query parameter parser for REST-APIs based on Laravel's framework.
 
 ## Requirements
-- PHP >=7.3
+- PHP >=7.2
 - Laravel framework >= 6.2
 - Mockery >= 1.3 (dev)
 - PHPUnit >= 8.4 (dev)
 
 ## Installation
-- Add ionext/laravel-api-query-parser to your composer.json and make composer update, or composer require ionext/laravel-api-query-parser ~1.0
+- Add ionext/laravel-api-query-parser to your composer.json and make composer update, or composer require ionext/laravel-api-query-parser
 - Setup the service provider:
     in bootstrap/app.php add the following line:
     ```php
