@@ -2,6 +2,7 @@
 
 namespace ApiQueryParser;
 
+use ApiQueryParser\Params\Location;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use ApiQueryParser\Params\Filter;
@@ -16,6 +17,12 @@ trait BuilderParamsApplierTrait
         if ($params->hasFilter()) {
             foreach ($params->getFilters() as $filter) {
                 $this->applyFilter($query, $filter);
+            }
+        }
+
+        if ($params->hasLocation()) {
+            foreach ($params->getLocation() as $location) {
+                $this->applyLocation($query, $location);
             }
         }
 
@@ -107,6 +114,20 @@ trait BuilderParamsApplierTrait
                 [$field, $clauseOperator, $value]
             );
         }
+    }
+
+    protected function applyLocation(Builder $query, Location $location)
+    {
+        $query->selectRaw(
+            '*, (
+				6371 * ACOS(
+					COS( RADIANS('.$location->getLatitudeField().') ) *
+					COS( RADIANS(?) ) *
+					COS( RADIANS(?) - RADIANS('.$location->getLongitudeField().') ) +
+					SIN( RADIANS('.$location->getLatitudeField().') ) * SIN( RADIANS(?) )
+				)
+			) distance', [$location->getLatitudeValue(), $location->getLongitudeValue(), $location->getLatitudeValue()]
+        )->where('distance', '<=', $location->getRadiusValue());
     }
 
     protected function applySort(Builder $query, Sort $sort)

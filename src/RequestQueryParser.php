@@ -2,6 +2,7 @@
 
 namespace ApiQueryParser;
 
+use ApiQueryParser\Params\Location;
 use Illuminate\Http\Request;
 use ApiQueryParser\Params\Connection;
 use ApiQueryParser\Params\Filter;
@@ -23,6 +24,7 @@ class RequestQueryParser implements RequestQueryParserInterface
     public function parse(Request $request): RequestParamsInterface
     {
         $this->parseFilters($request);
+        $this->parseLocation($request);
         $this->parseSort($request);
         $this->parsePagination($request);
         $this->parseConnections($request);
@@ -43,6 +45,22 @@ class RequestQueryParser implements RequestQueryParserInterface
             [$field, $operator, $value] = $filterDatas;
 
             $this->requestParams->addFilter(new Filter($field, $operator, $value));
+        }
+    }
+
+    protected function parseLocation(Request $request): void
+    {
+        $location = $request->has('location') ? $request->get('location') : [];
+
+        foreach ($location as $locationString) {
+            $locationData = explode(':', $locationString, 5);
+
+            if (count($locationData) < 5) {
+                throw new UnprocessableEntityHttpException('Filter must contains field and value!');
+            }
+            [$latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue] = $locationData;
+
+            $this->requestParams->addLocation(new Location($latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue));
         }
     }
 

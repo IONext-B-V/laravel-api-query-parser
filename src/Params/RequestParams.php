@@ -5,6 +5,7 @@ namespace ApiQueryParser\Params;
 class RequestParams implements RequestParamsInterface
 {
     protected $filters = [];
+    protected $location;
     protected $sorts = [];
     protected $pagination;
     protected $connections = [];
@@ -22,6 +23,21 @@ class RequestParams implements RequestParamsInterface
     public function getFilters(): array
     {
         return $this->filters;
+    }
+
+    public function addLocation(LocationInterface $location): void
+    {
+        $this->location = $location;
+    }
+
+    public function hasLocation(): bool
+    {
+        return !is_null($this->location);
+    }
+
+    public function getLocation(): ?LocationInterface
+    {
+        return $this->location;
     }
 
     public function addSort(SortInterface $sort): void
@@ -49,7 +65,7 @@ class RequestParams implements RequestParamsInterface
         return $this->pagination !== null;
     }
 
-    public function getPagination(): PaginationInterface
+    public function getPagination(): ?PaginationInterface
     {
         return $this->pagination;
     }

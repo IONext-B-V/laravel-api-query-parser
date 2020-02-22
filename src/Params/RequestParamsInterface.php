@@ -8,13 +8,17 @@ interface RequestParamsInterface
 
     public function getFilters(): array;
 
+    public function hasLocation(): bool;
+
+    public function getLocation(): ?LocationInterface;
+
     public function hasSort(): bool;
 
     public function getSorts(): array;
 
     public function hasPagination(): bool;
 
-    public function getPagination(): PaginationInterface;
+    public function getPagination(): ?PaginationInterface;
 
     public function hasConnection(): bool;
 
