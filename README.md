@@ -78,7 +78,8 @@ __Available filter options__
 
 ### Locating
 Q: /users?location=longitude_field:latitude_field:0.000000:0.000000:10
-R: will return the collection of the users within a radius of 10km from the provided latitude and longitude
+R: This requires the user to have longitude and latitude fields. It will return the collection of the users within a given (10km) radius from the provided latitude and longitude. The distance to each entity will be passed via a custom distance column.
+When using location, a simple paginator will be used due to a bug in Laravel. This means the last page will be null. 
 
 ### Sorting
 Q: /users?sort[]=name:ASC   

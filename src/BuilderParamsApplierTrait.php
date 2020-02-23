@@ -2,8 +2,8 @@
 
 namespace ApiQueryParser;
 
-use ApiQueryParser\Params\Location;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use ApiQueryParser\Params\LocationInterface;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use ApiQueryParser\Params\Filter;
 use ApiQueryParser\Params\RequestParamsInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait BuilderParamsApplierTrait
 {
-    public function applyParams(Builder $query, RequestParamsInterface $params): LengthAwarePaginator
+    public function applyParams(Builder $query, RequestParamsInterface $params): Paginator
     {
         if ($params->hasFilter()) {
             foreach ($params->getFilters() as $filter) {
@@ -21,9 +21,7 @@ trait BuilderParamsApplierTrait
         }
 
         if ($params->hasLocation()) {
-            foreach ($params->getLocation() as $location) {
-                $this->applyLocation($query, $location);
-            }
+            $this->applyLocation($query, $params->getLocation());
         }
 
         if ($params->hasSort()) {
@@ -45,14 +43,21 @@ trait BuilderParamsApplierTrait
             $query->limit($pagination->getLimit());
             $query->offset($pagination->getPage() * $pagination->getLimit());
 
-            $paginator = $query->paginate(
-                $params->getPagination()->getLimit(),
-                ['*'],
-                'page',
-                $params->getPagination()->getPage()
-            );
+            if (!$params->hasLocation()) {
+                $paginator = $query->paginate(
+                    $params->getPagination()->getLimit(),
+                    ['*'],
+                    'page',
+                    $params->getPagination()->getPage()
+                );
+            } else {
+
+                $paginator = $query->simplePaginate(
+                    $params->getPagination()->getLimit()
+                );
+            }
         } else {
-            $paginator = $query->paginate($query->count(), ['*'], 'page', 1);
+            $paginator = $query->simplePaginate();
         }
 
         return $paginator;
@@ -116,18 +121,18 @@ trait BuilderParamsApplierTrait
         }
     }
 
-    protected function applyLocation(Builder $query, Location $location)
+    protected function applyLocation(Builder $query, LocationInterface $location)
     {
         $query->selectRaw(
             '*, (
 				6371 * ACOS(
 					COS( RADIANS('.$location->getLatitudeField().') ) *
-					COS( RADIANS(?) ) *
-					COS( RADIANS(?) - RADIANS('.$location->getLongitudeField().') ) +
-					SIN( RADIANS('.$location->getLatitudeField().') ) * SIN( RADIANS(?) )
+					COS( RADIANS('.$location->getLatitudeValue().') ) *
+					COS( RADIANS('.$location->getLongitudeValue().') - RADIANS('.$location->getLongitudeField().') ) +
+					SIN( RADIANS('.$location->getLatitudeField().') ) * SIN( RADIANS('.$location->getLatitudeValue().') )
 				)
-			) distance', [$location->getLatitudeValue(), $location->getLongitudeValue(), $location->getLatitudeValue()]
-        )->where('distance', '<=', $location->getRadiusValue());
+			) distance'
+        )->having('distance', '<=', $location->getRadiusValue());
     }
 
     protected function applySort(Builder $query, Sort $sort)

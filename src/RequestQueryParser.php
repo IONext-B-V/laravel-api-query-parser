@@ -50,18 +50,19 @@ class RequestQueryParser implements RequestQueryParserInterface
 
     protected function parseLocation(Request $request): void
     {
-        $location = $request->has('location') ? $request->get('location') : [];
-
-        foreach ($location as $locationString) {
-            $locationData = explode(':', $locationString, 5);
-
-            if (count($locationData) < 5) {
-                throw new UnprocessableEntityHttpException('Filter must contains field and value!');
-            }
-            [$latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue] = $locationData;
-
-            $this->requestParams->addLocation(new Location($latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue));
+        if (!$request->has('location')) {
+            return;
         }
+
+        $locationData = explode(':', $request->get('location'), 5);
+
+        if (count($locationData) < 5) {
+            throw new UnprocessableEntityHttpException('Filter must contains field and value!');
+        }
+
+        [$latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue] = $locationData;
+
+        $this->requestParams->addLocation(new Location($latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue));
     }
 
     protected function parseSort(Request $request): void
