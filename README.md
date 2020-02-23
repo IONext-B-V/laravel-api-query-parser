@@ -12,9 +12,13 @@ This is a simple request query parameter parser for REST-APIs based on Laravel's
 ## Installation
 - Add ionext/laravel-api-query-parser to your composer.json and make composer update, or composer require ionext/laravel-api-query-parser
 - Setup the service provider:
-    in bootstrap/app.php add the following line:
+    in config/app.php add the following line:
     ```php
-    $app->register(ApiQueryParser\Provider\RequestQueryParserProvider::class);
+    'providers' => [
+        ...
+        ApiQueryParser\Provider\RequestQueryParserProvider::class,
+        ...  
+    ];
     ```
     
 ## Usage
@@ -72,6 +76,10 @@ __Available filter options__
 | le	        | Lesser than or equal  | level:le:3 |
 | in	        | In array              | level:in:1&#124;2&#124;3 |
 
+### Locating
+Q: /users?location=longitude_field:latitude_field:0.000000:0.000000:10
+R: will return the collection of the users within a radius of 10km from the provided latitude and longitude
+
 ### Sorting
 Q: /users?sort[]=name:ASC   
 R: will return the collection of the users sort by their names ascending
@@ -82,6 +90,6 @@ R: will return a part of the collection of the users (from the 21st to 30th)
 
 ### Credits
 Package was originally developed by Gábor Németh (github: https://github.com/ngabor84) for Laravel Lumen(https://github.com/ngabor84/lumen-api-query-parser). The realisation of this package
-simply required some refactoring to be used with Laravel.
+required some refactoring to be used with Laravel.
 
 

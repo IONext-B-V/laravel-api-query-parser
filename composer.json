@@ -2,7 +2,7 @@
     "name": "ionext/laravel-api-query-parser",
     "description": "A query parser for REST-APIs based on the laravel framework",
     "keywords": ["laravel", "query parser", "api"],
-    "homepage": "https://github.com/ngabor84/lumen-api-query-parser",
+    "homepage": "https://github.com/ionext/laravel-api-query-parser",
     "type": "library",
     "license": "MIT",
     "authors": [
