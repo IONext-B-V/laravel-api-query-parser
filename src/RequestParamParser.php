@@ -12,7 +12,7 @@ class RequestParamParser implements RequestParamParserInterface
     /**
      * @var array
      */
-    protected $query;
+    protected $query = [];
 
     public function parse(RequestParamsInterface $requestParams): string
     {
