@@ -75,6 +75,7 @@ __Available filter options__
 | lt	        | Lesser than           | level:lt:4 |
 | le	        | Lesser than or equal  | level:le:3 |
 | in	        | In array              | level:in:1&#124;2&#124;3 |
+| nin	        | Not in array          | level:nin:1&#124;2&#124;3 |
 
 ### Locating
 Q: /users?location=longitude_field:latitude_field:0.000000:0.000000:10

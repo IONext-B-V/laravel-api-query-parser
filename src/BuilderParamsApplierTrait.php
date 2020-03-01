@@ -107,12 +107,17 @@ trait BuilderParamsApplierTrait
             case 'le':
                 $clauseOperator = '<=';
                 break;
+            case 'in':
+            case 'nin':
+                break;
             default:
                 throw new BadRequestHttpException(sprintf('Not allowed operator: %s', $operator));
         }
 
         if ($operator === 'in') {
             $query->whereIn($filter, explode('|', $value));
+        } else if ($operator === 'nin') {
+            $query->whereNotIn($filter, explode('|', $value));
         } else {
             call_user_func_array(
                 [$query, $method],
