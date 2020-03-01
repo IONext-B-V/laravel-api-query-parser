@@ -115,9 +115,9 @@ trait BuilderParamsApplierTrait
         }
 
         if ($operator === 'in') {
-            $query->whereIn($filter, explode('|', $value));
+            $query->whereIn($field, explode('|', $value));
         } else if ($operator === 'nin') {
-            $query->whereNotIn($filter, explode('|', $value));
+            $query->whereNotIn($field, explode('|', $value));
         } else {
             call_user_func_array(
                 [$query, $method],
