@@ -13,4 +13,6 @@ interface LocationInterface
     public function getLongitudeValue(): float;
 
     public function getRadiusValue(): float;
+
+    public function getJoinDefinition(): ?string;
 }

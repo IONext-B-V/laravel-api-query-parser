@@ -66,7 +66,12 @@ trait BuilderParamsApplierTrait
     protected function applyFilter(Builder $query, Filter $filter): void
     {
         $table = $query->getModel()->getTable();
-        $field = sprintf('%s.%s', $table, $filter->getField());
+        if (strpos($filter->getField(), '.') === false) {
+            $field = sprintf('%s.%s', $table, $filter->getField());
+        } else {
+            $field = $filter->getField();
+        }
+
         $operator = $filter->getOperator();
         $value = $filter->getValue();
         $method = 'where';
@@ -128,16 +133,30 @@ trait BuilderParamsApplierTrait
 
     protected function applyLocation(Builder $query, LocationInterface $location)
     {
-        $query->selectRaw(
-            '*, (
+        if ($joinDefinition = $location->getJoinDefinition()) {
+            [$tableField, $foreignKey] = explode('|', $joinDefinition);
+
+            $columnPrefix = "{$tableField}.";
+        } else {
+            $columnPrefix = null;
+        }
+
+        $select = $query->getModel()->getTable().'.*, (
 				6371 * ACOS(
-					COS( RADIANS('.$location->getLatitudeField().') ) *
+					COS( RADIANS('.$columnPrefix.$location->getLatitudeField().') ) *
 					COS( RADIANS('.$location->getLatitudeValue().') ) *
-					COS( RADIANS('.$location->getLongitudeValue().') - RADIANS('.$location->getLongitudeField().') ) +
-					SIN( RADIANS('.$location->getLatitudeField().') ) * SIN( RADIANS('.$location->getLatitudeValue().') )
+					COS( RADIANS('.$location->getLongitudeValue().') - RADIANS('.$columnPrefix.$location->getLongitudeField().') ) +
+					SIN( RADIANS('.$columnPrefix.$location->getLatitudeField().') ) * SIN( RADIANS('.$location->getLatitudeValue().') )
 				)
-			) distance'
-        )->having('distance', '<=', $location->getRadiusValue());
+			) distance';
+
+        if (isset($tableField) && isset($foreignKey) && $query->getModel()->getTable()) {
+            $select = "{$tableField}.{$location->getLatitudeField()}, {$tableField}.{$location->getLongitudeField()}, {$tableField}.id AS location_id, {$select}";
+
+            $query->join($tableField, $foreignKey, '=', $query->getModel()->getTable().'.id');
+        }
+
+        $query->selectRaw($select)->having('distance', '<=', $location->getRadiusValue());
     }
 
     protected function applySort(Builder $query, Sort $sort)

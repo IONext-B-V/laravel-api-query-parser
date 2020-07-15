@@ -77,10 +77,18 @@ __Available filter options__
 | in	        | In array              | level:in:1&#124;2&#124;3 |
 | nin	        | Not in array          | level:nin:1&#124;2&#124;3 |
 
+#### Note on filtering based on relational values
+It is now possible to filter based on relational values using the table.column notation. eg. comments.author:eq:mike
+
 ### Locating
 Q: /users?location=longitude_field:latitude_field:0.000000:0.000000:10
 R: This requires the user to have longitude and latitude fields. It will return the collection of the users within a given (10km) radius from the provided latitude and longitude. The distance to each entity will be passed via a custom distance column.
 When using location, a simple paginator will be used due to a bug in Laravel. This means the last page will be null. 
+
+#### Advanced location, joining tables
+Q: /users?location=longitude_field:latitude_field:0.000000:0.000000:10:offices|office_id
+R: Notice the last parameter separated by a pipe(|). This allows joining another table on containing the latitude and longitude information, 
+adding location_id, latitude and longitude fields to the final result.
 
 ### Sorting
 Q: /users?sort[]=name:ASC   

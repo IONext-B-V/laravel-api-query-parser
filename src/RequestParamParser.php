@@ -49,7 +49,13 @@ class RequestParamParser implements RequestParamParserInterface
             return;
         }
 
-        $this->query[] = "location={$location->getLatitudeField()}:{$location->getLongitudeField()}:{$location->getLatitudeValue()}:{$location->getLongitudeValue()}:{$location->getRadiusValue()}";
+        $query = "{$location->getLatitudeField()}:{$location->getLongitudeField()}:{$location->getLatitudeValue()}:{$location->getLongitudeValue()}:{$location->getRadiusValue()}";
+
+        if ($joinDefinition = $location->getJoinDefinition()) {
+            $query .= ":{$joinDefinition}";
+        }
+
+        $this->query[] = "location={$query}";
     }
 
     protected function parseSort(RequestParamsInterface $params): void

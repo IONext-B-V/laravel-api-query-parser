@@ -54,15 +54,23 @@ class RequestQueryParser implements RequestQueryParserInterface
             return;
         }
 
-        $locationData = explode(':', $request->get('location'), 5);
+        $locationData = explode(':', $request->get('location'), 6);
 
         if (count($locationData) < 5) {
-            throw new UnprocessableEntityHttpException('Filter must contains field and value!');
+            throw new UnprocessableEntityHttpException('Location input must be formatted according: latitude_field:longitude_field:0.000000:0.000000:radius');
         }
 
-        [$latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue] = $locationData;
+        if (count($locationData) === 5) {
+            [$latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue] = $locationData;
+        } else {
+            [$latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue, $joinDefinition] = $locationData;
 
-        $this->requestParams->addLocation(new Location($latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue));
+            if (strpos($joinDefinition, '|') === false) {
+                throw new UnprocessableEntityHttpException('Invalid Join definition format for location input. Separate table and foreign key using a pipe.');
+            }
+        }
+
+        $this->requestParams->addLocation(new Location($latitudeField, $longitudeField, $latitudeValue, $longitudeValue, $radiusValue, $joinDefinition ?? null));
     }
 
     protected function parseSort(Request $request): void

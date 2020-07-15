@@ -12,15 +12,9 @@ interface RequestParamsInterface
 
     public function getLocation(): ?LocationInterface;
 
-    public function addLocation(LocationInterface $location): void;
-
     public function hasSort(): bool;
 
     public function getSorts(): array;
-
-    public function addSort(SortInterface $sort): void;
-
-    public function addPagination(PaginationInterface $pagination): void;
 
     public function hasPagination(): bool;
 
@@ -29,8 +23,4 @@ interface RequestParamsInterface
     public function hasConnection(): bool;
 
     public function getConnections(): array;
-
-    public function addConnection(ConnectionInterface $connection): void;
-
-    public function addFilter(FilterInterface $filter): void;
 }
