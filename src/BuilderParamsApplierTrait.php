@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use ApiQueryParser\Params\Filter;
 use ApiQueryParser\Params\RequestParamsInterface;
 use ApiQueryParser\Params\Sort;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait BuilderParamsApplierTrait
@@ -70,6 +71,8 @@ trait BuilderParamsApplierTrait
             $field = sprintf('%s.%s', $table, $filter->getField());
         } else {
             $field = $filter->getField();
+            $joinTable = current(explode('.', $field));
+            $query->leftJoin($joinTable, $joinTable.'.id', '=', $table.'.'.Str::singular($joinTable).'_id');
         }
 
         $operator = $filter->getOperator();
